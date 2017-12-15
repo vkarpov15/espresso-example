@@ -67,4 +67,26 @@ describe('Espresso', function() {
     let res = await axios.get('http://localhost:3000/write/your/own');
     assert.equal(res.data, 'Wrote your own Express!');
   });
+
+  it('using async/await', async function() {
+    const app = new Espresso();
+
+    // This does **not** currently work with Express, the request will just
+    // hang forever.
+    app.get('/', async function(req, res) {
+      throw new Error('woops!');
+    });
+
+    server = app.listen(3000);
+
+    let threw = false;
+    try {
+      await axios.get('http://localhost:3000/');
+    } catch (error) {
+      assert.equal(error.response.status, 500);
+      assert.equal(error.response.data, 'Internal Server Error');
+      threw = true;
+    }
+    assert.ok(threw);
+  });
 });
