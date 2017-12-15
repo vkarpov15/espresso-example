@@ -50,4 +50,21 @@ describe('Espresso', function() {
     res = await axios.get('http://localhost:3000/goodbye/everyone');
     assert.equal(res.data, 'Goodbye, everyone');
   });
+
+  it('using router', async function() {
+    const app = new Espresso();
+
+    const nestedRouter = Espresso.Router();
+    nestedRouter.get('/own', (req, res) => res.end('Wrote your own Express!'));
+
+    const router = Espresso.Router();
+    router.use('/your', nestedRouter);
+
+    app.use('/write', router);
+
+    server = app.listen(3000);
+
+    let res = await axios.get('http://localhost:3000/write/your/own');
+    assert.equal(res.data, 'Wrote your own Express!');
+  });
 });
