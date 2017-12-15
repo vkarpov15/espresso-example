@@ -37,4 +37,17 @@ describe('Espresso', function() {
     assert.equal(res.headers['access-control-allow-origin'], '*');
     assert.equal(res.data, 'Hello with CORS');
   });
+
+  it('basic routing', async function() {
+    const app = new Espresso();
+    app.get('/hello/:id', (req, res) => res.end(`Hello, ${req.params.id}`));
+    app.get('/goodbye/:id', (req, res) => res.end(`Goodbye, ${req.params.id}`));
+    server = app.listen(3000);
+
+    let res = await axios.get('http://localhost:3000/hello/world');
+    assert.equal(res.data, 'Hello, world');
+
+    res = await axios.get('http://localhost:3000/goodbye/everyone');
+    assert.equal(res.data, 'Goodbye, everyone');
+  });
 });
